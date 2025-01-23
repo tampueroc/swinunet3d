@@ -119,7 +119,8 @@ class FireDataset:
             frame_masks.append(mask)
 
         # Stack along the temporal dimension => [T, C, H, W]
-        fire_sequence = torch.stack(frame_masks, dim=0)  # [T, 1, H, W]
+        fire_sequence = torch.stack(frame_masks, dim=0)     # [T, 1, H, W]
+        fire_sequence = fire_sequence.permute(1, 2, 3, 0)   # [C, H, W, T]
 
         # 2) Static Data (landscape)
         static_data = item['landscape']  # [1, C, H, W]
