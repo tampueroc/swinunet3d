@@ -1,4 +1,7 @@
 import pytorch_lightning as pl
+import torchmetrics
+import torch.optim as optim
+import torch.nn.functional as F
 from .encoder import Encoder
 from .decoder import Decoder
 from .blocks import Converge
@@ -18,6 +21,22 @@ class SwinUNet3D(pl.LightningModule):
                  num_classes: int = 1
                  ):
         super().__init__()
+         # Metrics for training
+        self.train_accuracy = torchmetrics.classification.BinaryAccuracy()
+        self.train_precision = torchmetrics.classification.BinaryPrecision()
+        self.train_recall = torchmetrics.classification.BinaryRecall()
+        self.train_f1 = torchmetrics.classification.BinaryF1Score()
+
+        # Metrics for training
+        self.val_accuracy = torchmetrics.classification.BinaryAccuracy()
+        self.val_precision = torchmetrics.classification.BinaryPrecision()
+        self.val_recall = torchmetrics.classification.BinaryRecall()
+        self.val_f1 = torchmetrics.classification.BinaryF1Score()
+
+        # Loss
+        self.loss_fn = F.binary_cross_entropy_with_logits
+
+        # Encoders
         self.enc12 = Encoder(
             in_dims=in_channels,
             hidden_dims=hidden_dim,
@@ -62,6 +81,8 @@ class SwinUNet3D(pl.LightningModule):
             dropout=dropout,
             relative_pos_embedding=relative_pos_embedding
         )
+
+        # Decoder
         self.dec4 = Decoder(
             in_dims=hidden_dim * 8,
             out_dims=hidden_dim * 4,
@@ -131,4 +152,41 @@ class SwinUNet3D(pl.LightningModule):
         out = self.final(up12)
 
         return out
+
+    def training_step(self, batch, batch_idx):
+        fire_seq, static_data, wind_inputs, isochrone_mask, valid_tokens = batch
+        pred = self(fire_seq)
+        loss = self.loss_fn(pred, isochrone_mask)
+        self.log("train_loss", loss)
+
+        # Update metrics
+        self.train_accuracy(pred, isochrone_mask)
+        self.train_precision(pred, isochrone_mask)
+        self.train_recall(pred, isochrone_mask)
+        self.train_f1(pred, isochrone_mask)
+
+        self.log("train_accuracy", self.train_accuracy, on_step=True, on_epoch=False)
+        self.log("train_precision", self.train_precision, on_step=True, on_epoch=False)
+        self.log("train_recall", self.train_recall, on_step=True, on_epoch=False)
+        self.log("train_f1", self.train_f1, on_step=True, on_epoch=False)
+
+    def validation_step(self, batch, batch_idx):
+        fire_seq, static_data, wind_inputs, isochrone_mask, valid_tokens = batch
+        pred = self(fire_seq)
+        loss = self.loss_fn(pred, isochrone_mask)
+        self.log("val_loss", loss)
+
+        # Update metrics
+        self.val_accuracy(pred, isochrone_mask)
+        self.val_precision(pred, isochrone_mask)
+        self.val_recall(pred, isochrone_mask)
+        self.val_f1(pred, isochrone_mask)
+
+        self.log("val_accuracy", self.val_accuracy, on_step=False, on_epoch=True)
+        self.log("val_precision", self.val_precision, on_step=False, on_epoch=True)
+        self.log("val_recall", self.val_recall, on_step=False, on_epoch=True)
+        self.log("val_f1", self.val_f1, on_step=False, on_epoch=True)
+
+    def configure_optimizers(self):
+        return optim.Adam(self.parameters(), lr=self.learning_rate)
 
