@@ -1,7 +1,7 @@
 import torch.nn as nn
 from einops import rearrange, einsum
 from typing import Union, List
-from helpers import CyclicShift3D, create_mask3D
+from .helpers import CyclicShift3D, create_mask3D
 import numpy as np
 
 class WindowAttention3D(nn.Module):
@@ -17,9 +17,9 @@ class WindowAttention3D(nn.Module):
 
         # Window Size
         if type(window_size) is int:
-            window_size = np.array([window_size, window_size, window_size])
+            self.window_size = np.array([window_size, window_size, window_size])
         else:
-            window_size = np.array(window_size)
+            self.window_size = np.array(window_size)
 
         inner_dim = head_dim * heads
         self.heads = heads
@@ -27,7 +27,7 @@ class WindowAttention3D(nn.Module):
         self.shifted = shifted
 
         if self.shifted is True:
-            displacement = window_size // 2
+            displacement = self.window_size // 2
             self.cyclic_shift = CyclicShift3D(
                     displacement=-displacement
             )

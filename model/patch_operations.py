@@ -1,5 +1,5 @@
 import torch.nn as nn
-from helpers import Norm
+from .helpers import Norm
 
 class PatchMerging3D(nn.Module):
     def __init__(self, in_dim, out_dim, downscaling_factor):

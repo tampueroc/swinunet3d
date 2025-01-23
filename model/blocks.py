@@ -1,8 +1,8 @@
 import torch.nn as nn
 from typing import List, Union
-from helpers import Norm, Residual3D, PreNorm3D
-from attention import WindowAttention3D
-from feed_forward import FeedForward3D
+from .helpers import Norm, Residual3D, PreNorm3D
+from .attention import WindowAttention3D
+from .feed_forward import FeedForward3D
 
 class ConvBlock(nn.Module):
     def __init__(self, in_ch, out_ch):
@@ -32,7 +32,7 @@ class SwinBlock3D(nn.Module):
                  shifted: bool,
                  window_size: Union[int, List[int]],
                  relative_pos_embedding: bool = True,
-                 droput: float = 0.0
+                 dropout: float = 0.0
                  ):
         super().__init__()
         self.attention_block = Residual3D(
@@ -54,7 +54,7 @@ class SwinBlock3D(nn.Module):
                 fn=FeedForward3D(
                         dim=dim,
                         hidden_dim=mlp_dim,
-                        dropout=droput
+                        dropout=dropout
                 )
             )
         )

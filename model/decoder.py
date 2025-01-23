@@ -1,8 +1,8 @@
 import torch.nn as nn
 from typing import Union, List
 from einops.layers.torch import Rearrange
-from patch_operations import PatchExpanding3D
-from blocks import ConvBlock, SwinBlock3D
+from .patch_operations import PatchExpanding3D
+from .blocks import ConvBlock, SwinBlock3D
 
 class Decoder(nn.Module):
     def __init__(self,

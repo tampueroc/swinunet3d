@@ -169,6 +169,7 @@ class SwinUNet3D(pl.LightningModule):
         self.log("train_precision", self.train_precision, on_step=True, on_epoch=False)
         self.log("train_recall", self.train_recall, on_step=True, on_epoch=False)
         self.log("train_f1", self.train_f1, on_step=True, on_epoch=False)
+        return {"loss": loss, "predictions": pred, "targets": isochrone_mask}
 
     def validation_step(self, batch, batch_idx):
         fire_seq, static_data, wind_inputs, isochrone_mask, valid_tokens = batch
@@ -186,6 +187,7 @@ class SwinUNet3D(pl.LightningModule):
         self.log("val_precision", self.val_precision, on_step=False, on_epoch=True)
         self.log("val_recall", self.val_recall, on_step=False, on_epoch=True)
         self.log("val_f1", self.val_f1, on_step=False, on_epoch=True)
+        return {"loss": loss, "predictions": pred, "targets": isochrone_mask}
 
     def configure_optimizers(self):
         return optim.Adam(self.parameters(), lr=self.learning_rate)

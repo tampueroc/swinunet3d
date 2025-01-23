@@ -13,7 +13,7 @@ def load_yaml_config(path):
 
 def main(args):
     global_cfg = load_yaml_config(args.global_config)
-    model_cfg = load_yaml_config(args.model_cfg)
+    model_cfg = load_yaml_config(args.model_config)
     trainer_cfg = load_yaml_config(args.trainer_config)
     data_cfg = load_yaml_config(args.data_config)
 
@@ -66,7 +66,7 @@ def main(args):
         heads=model_cfg['heads'],
         head_dim=model_cfg['head_dim'],
         window_size=model_cfg['window_size'],
-        dropout=model_cfg['droput'],
+        dropout=model_cfg['dropout'],
         relative_pos_embedding=model_cfg['relative_pos_embedding'],
         num_classes=model_cfg['num_classes']
     )
