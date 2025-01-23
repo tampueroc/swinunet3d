@@ -20,7 +20,7 @@ class Decoder(nn.Module):
         self.patch_expand = PatchExpanding3D(
             in_dim=in_dims,
             out_dim=out_dims,
-            up_scaling_factor=upscaling_factor
+            upscaling_factor=upscaling_factor
         )
         # Rearrange
         self.re1 = Rearrange('b c h w d -> b h w d c')
@@ -42,7 +42,7 @@ class Decoder(nn.Module):
                     shifted=False,
                     window_size=window_size,
                     relative_pos_embedding=relative_pos_embedding,
-                    droput=dropout
+                    dropout=dropout
                 ),
                 SwinBlock3D(
                     dim=out_dims,
@@ -52,7 +52,7 @@ class Decoder(nn.Module):
                     shifted=False,
                     window_size=window_size,
                     relative_pos_embedding=relative_pos_embedding,
-                    droput=dropout
+                    dropout=dropout
                 )]))
 
     def forward(self, x):

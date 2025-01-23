@@ -77,7 +77,7 @@ def main(args):
         accelerator=trainer_cfg['accelerator'],
         devices=trainer_cfg['devices'],
         precision=trainer_cfg['precision'],
-        logger=logger['logger'],
+        logger=logger,
         callbacks=callbacks
     )
     trainer.fit(

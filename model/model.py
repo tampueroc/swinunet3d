@@ -18,9 +18,11 @@ class SwinUNet3D(pl.LightningModule):
                  window_size: list,
                  dropout: float = 0.0,
                  relative_pos_embedding: bool = True,
-                 num_classes: int = 1
+                 num_classes: int = 1,
+                 learning_rate: float = 3e-4
                  ):
         super().__init__()
+        self.learning_rate = learning_rate
          # Metrics for training
         self.train_accuracy = torchmetrics.classification.BinaryAccuracy()
         self.train_precision = torchmetrics.classification.BinaryPrecision()
