@@ -19,8 +19,7 @@ class SwinUNet3D(pl.LightningModule):
                  dropout: float = 0.0,
                  relative_pos_embedding: bool = True,
                  num_classes: int = 1,
-                 learning_rate: float = 3e-4,
-                 stl_channels: int = 32
+                 learning_rate: float = 3e-4
                  ):
         super().__init__()
         self.learning_rate = learning_rate
@@ -132,11 +131,11 @@ class SwinUNet3D(pl.LightningModule):
 
         self.final = FinalExpand3D(
                 in_dim=hidden_dim,
-                out_dim=stl_channels,
+                out_dim=32,
                 upscaling_factor=downscaling_factors[0]
         )
         self.out = nn.Sequential(
-            nn.Conv3d(stl_channels, num_classes, kernel_size=1)
+            nn.Conv3d(hidden_dim, num_classes, kernel_size=(1, 1, 1)),  # Predict 1 Z-slice
         )
 
     def forward(self, x):
@@ -157,7 +156,6 @@ class SwinUNet3D(pl.LightningModule):
         up12 = self.converge12(up12, down12)
 
         out = self.final(up12)
-        out = self.out(out)
 
         return out
 

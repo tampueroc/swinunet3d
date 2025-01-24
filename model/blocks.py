@@ -101,7 +101,8 @@ class FinalExpand3D(nn.Module):
                 out_channels=out_dim,
                 kernel_size=upscaling_factor,
                 stride=upscaling_factor,
-                padding=(upscaling_factor - 1) // 2
+                padding=(upscaling_factor - 1) // 2,
+                output_padding=1
             ),
             Norm(out_dim),
             nn.PReLU()
@@ -117,5 +118,7 @@ class FinalExpand3D(nn.Module):
         Returns:
             Tensor: Output tensor after upsampling and transformation.
         """
-        return self.net(x)
+        x = self.net(x)
+        x = x[:, :, :, :, -1:]  # Keep only the last time dimension
+        return x
 
