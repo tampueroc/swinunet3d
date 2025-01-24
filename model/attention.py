@@ -1,5 +1,6 @@
 import torch.nn as nn
-from einops import rearrange, einsum
+from torch import einsum
+from einops import rearrange
 import pdb
 from typing import Union, List
 from .helpers import CyclicShift3D, create_mask3D
