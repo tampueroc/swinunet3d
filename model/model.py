@@ -134,6 +134,9 @@ class SwinUNet3D(pl.LightningModule):
                 out_dim=32,
                 upscaling_factor=downscaling_factors[0]
         )
+        self.out = nn.Sequential(
+            nn.Conv3d(hidden_dim, num_classes, kernel_size=(1, 1, 1)),  # Predict 1 Z-slice
+        )
 
     def forward(self, x):
 
