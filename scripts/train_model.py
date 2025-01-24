@@ -78,6 +78,7 @@ def main(args):
         devices=trainer_cfg['devices'],
         precision=trainer_cfg['precision'],
         logger=logger,
+        strategy=trainer_cfg['ddp'],
         callbacks=callbacks
     )
     trainer.fit(
