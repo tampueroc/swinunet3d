@@ -64,9 +64,15 @@ class WindowAttention3D(nn.Module):
             x = self.cyclic_shift(x)
         b, n_x, n_y, n_z, _, h = *x.shape, self.heads
         qkv = self.to_qkv(x).chunk(3, dim=-1)
-        nw_x = n_x // self.window_size[0]
-        nw_y = n_y // self.window_size[1]
-        nw_z = n_z // self.window_size[2]
+
+        w_x, w_y, w_z = self.window_size
+        assert n_x % w_x == 0, f"Window size does not divide spatial dimensions (x-axis) of dimension {n_x}."
+        assert n_y % w_y == 0, f"Window size does not divide spatial dimensions (y-axis) of dimension {n_y}."
+        assert n_z % w_z == 0, f"Window size does not divide spatial dimensions (z-axis) of dimension {n_z}."
+
+        nw_x = n_x // w_x
+        nw_y = n_y // w_y
+        nw_z = n_z // w_z
         q, k, v = map(
             lambda t: rearrange(t, 'b (nw_x w_x) (nw_y w_y) (nw_z w_z) (h d) -> b h (nw_x nw_y nw_z) (w_x w_y w_z) d',
                                 h=h, w_x=self.window_size[0], w_y=self.window_size[1], w_z=self.window_size[2]), qkv)
