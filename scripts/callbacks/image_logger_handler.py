@@ -24,6 +24,8 @@ class ImageLoggerHandler(Callback):
         """
         if batch_idx == 0 and (pl_module.current_epoch % self.log_interval == 0):
             pred, target = outputs["predictions"], outputs["targets"]
+            pred = pred.squeeze(-1)  # Remove the T=1 dimension
+            target = target.squeeze(-1)  # If targets also have T=1
 
             # Normalize predictions to [0, 1] for visualization
             pred_images = torch.sigmoid(pred.detach().cpu())  # Apply sigmoid for visualization
