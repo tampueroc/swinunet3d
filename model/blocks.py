@@ -83,3 +83,39 @@ class Converge(nn.Module):
         x = self.norm(x)
         return x
 
+class FinalExpand3D(nn.Module):
+    """
+    FinalExpand3D performs upsampling and feature transformation for voxel classification tasks.
+
+    Args:
+        in_dim (int): Number of input channels.
+        out_dim (int): Number of output channels.
+        upscaling_factor (int): Factor by which to upsample the input in spatial dimensions.
+    """
+    def __init__(self, in_dim, out_dim, upscaling_factor):
+        super(FinalExpand3D, self).__init__()
+
+        self.net = nn.Sequential(
+            nn.ConvTranspose3d(
+                in_channels=in_dim,
+                out_channels=out_dim,
+                kernel_size=upscaling_factor,
+                stride=upscaling_factor,
+                padding=(upscaling_factor - 1) // 2
+            ),
+            Norm(out_dim),
+            nn.PReLU()
+        )
+
+    def forward(self, x):
+        """
+        Forward pass.
+
+        Args:
+            x (Tensor): Input tensor of shape (B, C, H, W, D).
+
+        Returns:
+            Tensor: Output tensor after upsampling and transformation.
+        """
+        return self.net(x)
+

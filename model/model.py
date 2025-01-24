@@ -4,7 +4,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from .encoder import Encoder
 from .decoder import Decoder
-from .blocks import Converge
+from .blocks import Converge, FinalExpand3D
 import torch.nn as nn
 
 class SwinUNet3D(pl.LightningModule):
@@ -129,9 +129,10 @@ class SwinUNet3D(pl.LightningModule):
             dim=hidden_dim
         )
 
-        self.final = nn.Sequential(
-            nn.Conv3d(hidden_dim, num_classes, kernel_size=(1, 1, 1)),
-            nn.Conv3d(num_classes, num_classes, kernel_size=(1, 1, 1))
+        self.final = FinalExpand3D(
+                in_dim=hidden_dim,
+                out_dim=32,
+                upscaling_factor=downscaling_factors[0]
         )
 
     def forward(self, x):
